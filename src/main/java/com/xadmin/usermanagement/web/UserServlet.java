@@ -14,12 +14,12 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/UserMangement")
+@WebServlet("/")
 public class UserServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private UserDao userDao;
 	
-	public void init() {
+	public void init() throws ServletException {
 		userDao = new UserDao();
 	}
 
@@ -75,10 +75,18 @@ public class UserServlet extends HttpServlet {
 	private void showEditForm(HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, ServletException, IOException {
 		int id = Integer.parseInt(request.getParameter("id"));
-		User existingUser = userDao.selectUser(id);
-		RequestDispatcher dispatcher = request.getRequestDispatcher("user-form.jsp");
-		request.setAttribute("user", existingUser);
-		dispatcher.forward(request, response);
+		
+		User existingUser;
+		try {
+			
+			existingUser = userDao.selectUser(id);
+			RequestDispatcher dispatcher = request.getRequestDispatcher("user-form.jsp");
+			request.setAttribute("user", existingUser);
+			dispatcher.forward(request, response);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 
 	}
 
@@ -99,8 +107,8 @@ public class UserServlet extends HttpServlet {
 		String email = request.getParameter("email");
 		String country = request.getParameter("country");
 
-		User book = new User(id, name, email, country);
-		userDao.updateUser(book);
+		User user = new User(id, name, email, country);
+		userDao.updateUser(user);
 		response.sendRedirect("list");
 	}
 
